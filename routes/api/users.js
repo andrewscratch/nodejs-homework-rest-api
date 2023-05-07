@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const {User} = require("../../models/user");
 const {authenticate} = require("../../middlewares")
 const {schemas} = require("../../models/user");
-const {HttpError} = require("../../helpers")
+const {RequestError} = require("../../helpers")
 const {SECRET_KEY} = process.env;
 
 const router = express.Router();
@@ -15,13 +15,13 @@ router.post("/register", async (req, res, next) => {
     const user = await User.findOne({email});
 
     if(user) {
-        throw HttpError(409, "email already in use")
+        throw RequestError(409, "email already in use")
     }
     try {
         const {error} = schemas.registerSchema.validate(req.body);
     
         if (error) {
-          throw HttpError(400, error.message)
+          throw RequestError(400, error.message)
         }
 
         const hashPassword = await bcryptjs.hash(password, 10)
@@ -43,18 +43,18 @@ router.post("/login", async (req, res, next) => {
   const user = await User.findOne({email});
 
   if(!user) {
-      throw HttpError(401, "Email or password is wrong")
+      throw RequestError(401, "Email or password is wrong")
   }
   try {
   const {error} = schemas.loginSchema.validate(req.body);
   
   if (error) {
-      throw HttpError(400, error.message)
+      throw RequestError(400, error.message)
     }
 
 const passwordCompare = await bcryptjs.compare(password, user.password);
 if (!passwordCompare) {
-  throw HttpError(401, "Email or password is wrong")
+  throw RequestError(401, "Email or password is wrong")
 }
 
 const payload = {
