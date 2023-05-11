@@ -5,6 +5,10 @@ const joi = require("joi");
 const emailFormat = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 
 const userSchema = new Schema({
+  name: {
+    type: String,
+    required: [true, 'Set name for user'],
+  },
     password: {
         type: String,
         required: [true, 'Set password for user'],
@@ -20,7 +24,14 @@ const userSchema = new Schema({
         enum: ["starter", "pro", "business"],
         default: "starter"
     },
-    token: String
+    token: {
+      type: String,
+      default: "",
+    },
+    avatarURL: {
+      type: String,
+      required: true,
+    }
 }, { versionKey: false, timestamps: true });
 
 userSchema.post("save", handleSaveErrors);
