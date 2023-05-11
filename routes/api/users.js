@@ -1,9 +1,11 @@
 const express = require('express');
 const bcryptjs = require("bcryptjs");
 const jwt = require('jsonwebtoken');
+const gravatar = require("gravatar");
 
 const {User} = require("../../models/user");
-const {authenticate} = require("../../middlewares")
+const { authenticate, upload } = require("../../middlewares");
+const ctrl = require("../../controllers/authAvatars")
 const {schemas} = require("../../models/user");
 const {RequestError} = require("../../helpers")
 const {SECRET_KEY} = process.env;
@@ -24,7 +26,8 @@ router.post("/register", async (req, res, next) => {
           throw RequestError(400, error.message)
         }
 
-        const hashPassword = await bcryptjs.hash(password, 10)
+      const hashPassword = await bcryptjs.hash(password, 10);
+      const avatarURL = gravatar.url(email);
 
         const newUser = await User.create({...req.body, password: hashPassword});
         res.status(201).json({
@@ -105,5 +108,7 @@ router.post("/logout", authenticate, async (req, res, next) => {
       next(error)
     }
 })
+
+router.patch("/avatars", authenticate, upload.single("avatar"), ctrl.updateAvatar);
 
 module.exports = router;

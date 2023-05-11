@@ -3,12 +3,11 @@ const { RequestError } = require('../helpers');
 
 const isValidId = (req, res, next) => {
     const { contactId } = req.params;
-    const result = isValidObjectId(contactId);
-
-    if (!result) {
+    
+     if (!isValidObjectId(contactId)) {
         next(RequestError(404, `${contactId} isn't valid, try again`))
     }
-    next()
+    next();
 }
 
 module.exports = isValidId;
